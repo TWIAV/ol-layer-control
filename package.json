@@ -1,0 +1,17 @@
+{
+  "name": "ol-layer-control",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^8.3.0"
+  },
+  "dependencies": {
+    "ol": "latest",
+    "proj4": "^2.22.0"
+  }
+}

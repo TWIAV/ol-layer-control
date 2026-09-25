@@ -1,0 +1,372 @@
+/* ol-layer-control
+ *
+ * Theme it by overriding these custom properties on any ancestor of the
+ * panel (e.g. :root or body):
+ *
+ *   --ol-layer-control-bg        panel background
+ *   --ol-layer-control-fg        panel text colour
+ *   --ol-layer-control-border    panel and header border colour
+ *   --ol-layer-control-hover     hover background of icon buttons
+ *   --ol-layer-control-accent    checkbox / radio / resize handle colour
+ *   --ol-layer-control-font      panel font shorthand
+ *   --ol-layer-control-indent    indentation of nested groups
+ *   --ol-layer-control-shadow    panel drop shadow
+ */
+
+/* --- map button (inside the map, styled by ol.css as an .ol-control) --- */
+
+.ol-layer-control {
+  top: 0.5em;
+  right: 0.5em;
+}
+
+.ol-layer-control button svg {
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+
+/* --- panel (a sibling of the map element, docked to one side) --------- */
+
+.ol-layer-control-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  display: none;
+  flex-direction: column;
+  width: 320px;
+  background: var(--ol-layer-control-bg, #ffffff);
+  color: var(--ol-layer-control-fg, #222222);
+  font: var(--ol-layer-control-font, 14px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif);
+  border-left: 1px solid var(--ol-layer-control-border, #d0d4d9);
+  box-shadow: var(--ol-layer-control-shadow, 0 0 8px rgba(0, 0, 0, 0.12));
+}
+
+.ol-layer-control-panel--left {
+  right: auto;
+  left: 0;
+  border-left: 0;
+  border-right: 1px solid var(--ol-layer-control-border, #d0d4d9);
+}
+
+.ol-layer-control-panel--open {
+  display: flex;
+}
+
+.ol-layer-control-panel--resizing {
+  cursor: ew-resize;
+  user-select: none;
+}
+
+/* --- resize handle on the panel's inner edge ---------------------------- */
+
+.ol-layer-control-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -4px;
+  width: 8px;
+  z-index: 2;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.ol-layer-control-panel--left .ol-layer-control-resizer {
+  left: auto;
+  right: -4px;
+}
+
+.ol-layer-control-resizer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 3px;
+  width: 2px;
+  background: var(--ol-layer-control-accent, #3d7ecc);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.ol-layer-control-resizer:hover::after,
+.ol-layer-control-panel--resizing .ol-layer-control-resizer::after {
+  opacity: 1;
+}
+
+/* --- header ------------------------------------------------------------- */
+
+.ol-layer-control-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.6em 0.75em;
+  border-bottom: 1px solid var(--ol-layer-control-border, #d0d4d9);
+}
+
+.ol-layer-control-title {
+  flex: 1;
+  appearance: none;
+  margin: 0;
+  padding: 0.15em 0.3em;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  font-size: 1.05em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ol-layer-control-title:hover {
+  background: var(--ol-layer-control-hover, rgba(0, 0, 0, 0.06));
+}
+
+.ol-layer-control-title:focus-visible {
+  outline: 2px solid var(--ol-layer-control-accent, #3d7ecc);
+  outline-offset: 1px;
+}
+
+/* --- search box (shown via the panel title or the `search` option) ------ */
+
+.ol-layer-control-search {
+  display: none;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.5em 0.75em;
+  border-bottom: 1px solid var(--ol-layer-control-border, #d0d4d9);
+}
+
+.ol-layer-control-panel--search .ol-layer-control-search {
+  display: flex;
+}
+
+.ol-layer-control-search > svg {
+  flex: none;
+  width: 1.1em;
+  height: 1.1em;
+  opacity: 0.6;
+}
+
+.ol-layer-control-search input {
+  flex: 1;
+  min-width: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.35em 0.5em;
+  border: 1px solid var(--ol-layer-control-border, #d0d4d9);
+  border-radius: 4px;
+  background: var(--ol-layer-control-bg, #ffffff);
+  color: inherit;
+  font: inherit;
+}
+
+.ol-layer-control-search input:focus-visible {
+  outline: 2px solid var(--ol-layer-control-accent, #3d7ecc);
+  outline-offset: 1px;
+}
+
+.ol-layer-control-search input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.ol-layer-control-search-clear {
+  flex: none;
+  width: 1.4em;
+  height: 1.4em;
+}
+
+.ol-layer-control-item--hidden {
+  display: none;
+}
+
+/* While filtering, folded groups are opened so matches are visible. */
+.ol-layer-control-panel--filtering .ol-layer-control-group--folded > .ol-layer-control-list {
+  display: block;
+}
+
+.ol-layer-control-no-results {
+  margin: 0.5em 0;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.ol-layer-control-close,
+.ol-layer-control-fold,
+.ol-layer-control-opacity-toggle,
+.ol-layer-control-search-clear {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15em;
+  margin: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.ol-layer-control-close:hover,
+.ol-layer-control-fold:hover,
+.ol-layer-control-opacity-toggle:hover,
+.ol-layer-control-search-clear:hover {
+  background: var(--ol-layer-control-hover, rgba(0, 0, 0, 0.06));
+}
+
+.ol-layer-control-close:focus-visible,
+.ol-layer-control-fold:focus-visible,
+.ol-layer-control-opacity-toggle:focus-visible,
+.ol-layer-control-search-clear:focus-visible,
+.ol-layer-control-row input:focus-visible,
+.ol-layer-control-opacity input:focus-visible {
+  outline: 2px solid var(--ol-layer-control-accent, #3d7ecc);
+  outline-offset: 1px;
+}
+
+.ol-layer-control-close svg,
+.ol-layer-control-fold svg,
+.ol-layer-control-opacity-toggle svg,
+.ol-layer-control-search-clear svg {
+  width: 1.1em;
+  height: 1.1em;
+}
+
+/* --- layer tree --------------------------------------------------------- */
+
+.ol-layer-control-body {
+  flex: 1;
+  overflow: auto;
+  padding: 0.5em 0.75em 0.75em;
+}
+
+.ol-layer-control-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ol-layer-control-list .ol-layer-control-list {
+  padding-left: var(--ol-layer-control-indent, 1.4em);
+}
+
+.ol-layer-control-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  min-height: 1.9em;
+}
+
+/* Keeps a leaf's checkbox aligned with a group's checkbox (which sits after the fold button). */
+.ol-layer-control-spacer {
+  flex: none;
+  width: 1.4em;
+}
+
+.ol-layer-control-fold {
+  flex: none;
+  width: 1.4em;
+  height: 1.4em;
+}
+
+.ol-layer-control-fold svg {
+  transition: transform 0.15s;
+  transform: rotate(90deg);
+}
+
+.ol-layer-control-group--folded > .ol-layer-control-row .ol-layer-control-fold svg {
+  transform: rotate(0deg);
+}
+
+.ol-layer-control-group--folded > .ol-layer-control-list {
+  display: none;
+}
+
+.ol-layer-control-group--inactive > .ol-layer-control-list {
+  opacity: 0.5;
+}
+
+.ol-layer-control-row input {
+  flex: none;
+  margin: 0;
+  accent-color: var(--ol-layer-control-accent, #3d7ecc);
+}
+
+.ol-layer-control-label {
+  flex: 1;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+span.ol-layer-control-label {
+  cursor: default;
+}
+
+.ol-layer-control-group > .ol-layer-control-row .ol-layer-control-label {
+  font-weight: 600;
+}
+
+/* Group titles that can be right-clicked to toggle exclusive/non-exclusive. */
+.ol-layer-control-label--toggle {
+  cursor: context-menu;
+}
+
+/* Layers outside their min/max resolution or zoom at the current view:
+   greyed out like the contents of an unchecked group. */
+.ol-layer-control-item--out-of-range > .ol-layer-control-row,
+.ol-layer-control-item--out-of-range > .ol-layer-control-list {
+  opacity: 0.5;
+}
+
+/* --- opacity slider (revealed per layer by its button) ------------------ */
+
+.ol-layer-control-opacity-toggle {
+  flex: none;
+  width: 1.4em;
+  height: 1.4em;
+  opacity: 0.5;
+}
+
+.ol-layer-control-opacity-toggle:hover,
+.ol-layer-control-opacity-toggle:focus-visible,
+.ol-layer-control-layer--opacity-open > .ol-layer-control-row .ol-layer-control-opacity-toggle {
+  opacity: 1;
+}
+
+.ol-layer-control-layer--opacity-open > .ol-layer-control-row .ol-layer-control-opacity-toggle {
+  color: var(--ol-layer-control-accent, #3d7ecc);
+}
+
+.ol-layer-control-opacity {
+  display: none;
+  align-items: center;
+  gap: 0.5em;
+  /* Align with the label: spacer + gap + input + gap. */
+  padding: 0 0.2em 0.4em calc(1.4em + 0.8em + 13px);
+}
+
+.ol-layer-control-layer--opacity-open > .ol-layer-control-opacity {
+  display: flex;
+}
+
+.ol-layer-control-opacity input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  accent-color: var(--ol-layer-control-accent, #3d7ecc);
+}
+
+.ol-layer-control-opacity-value {
+  flex: none;
+  width: 3em;
+  text-align: right;
+  font-size: 0.9em;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
