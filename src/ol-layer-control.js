@@ -14,7 +14,7 @@
  *
  *   title                  string   Text shown in the panel. Layers without
  *                                   a title are not shown.
- *   displayInLayerSwitcher boolean  `false` hides the layer (or group).
+ *   displayInLayerControl  boolean  `false` hides the layer (or group).
  *   type                   'base'   Marks a basemap. A group that contains
  *                                   basemaps is exclusive and gets no
  *                                   checkbox of its own.
@@ -91,6 +91,8 @@ export const DEFAULT_I18N = Object.freeze({
  *     render the panel into. When set, the control leaves the map element
  *     alone and the host page is responsible for the layout.
  * @property {'left'|'right'} [side='right'] Side of the map the panel docks to.
+ * @property {ButtonPosition} [buttonPosition] Where the map button sits. Defaults to
+ *     `'top-left'` when `side` is `'left'` and `'right'` otherwise.
  * @property {number} [panelWidth=320] Initial panel width in pixels.
  * @property {number} [minPanelWidth=200] Smallest width the user can resize to.
  * @property {number} [maxPanelWidth=800] Largest width the user can resize to.
@@ -108,6 +110,23 @@ export const DEFAULT_I18N = Object.freeze({
  */
 
 const CSS = 'ol-layer-control';
+
+/**
+ * Where the map button sits on the map. Each position leaves room for the
+ * OpenLayers default control that normally occupies that corner:
+ *
+ *   'top-left'      below the Zoom buttons
+ *   'bottom-left'   in the bottom-left corner
+ *   'top-right'     in the top-right corner (shared with the Rotate button,
+ *                   which only shows when the map is rotated)
+ *   'right'         top-right, below the Rotate button
+ *   'bottom-right'  above the Attribution button
+ *
+ * @typedef {'top-left'|'bottom-left'|'top-right'|'right'|'bottom-right'} ButtonPosition
+ */
+
+/** @type {ReadonlyArray<ButtonPosition>} */
+export const BUTTON_POSITIONS = Object.freeze(['top-left', 'bottom-left', 'top-right', 'right', 'bottom-right']);
 
 const LAYERS_ICON =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
@@ -195,6 +214,8 @@ export default class LayerControl extends Control {
     this.i18n_ = {...DEFAULT_I18N, ...(options.i18n || {})};
     /** @private @type {'left'|'right'} */
     this.side_ = options.side === 'left' ? 'left' : 'right';
+    /** @private @type {ButtonPosition} */
+    this.defaultButtonPosition_ = this.side_ === 'left' ? 'top-left' : 'right';
     /** @private */
     this.defaultPanelWidth_ = options.panelWidth ?? 320;
     /** @private */
@@ -320,6 +341,9 @@ export default class LayerControl extends Control {
     this.on('change:open', () => this.applyLayout_());
     this.on('change:panelWidth', () => this.scheduleLayout_());
     this.on('change:searchVisible', () => this.applySearchVisibility_());
+    this.on('change:buttonPosition', () => this.applyButtonPosition_());
+    this.set('buttonPosition', this.normalizeButtonPosition_(options.buttonPosition), true);
+    this.applyButtonPosition_();
     this.set('open', !!options.open, true);
     this.set('searchVisible', options.search === true, true);
     this.applySearchVisibility_();
@@ -365,6 +389,20 @@ export default class LayerControl extends Control {
   /** @return {HTMLElement} The panel element. */
   getPanelElement() {
     return this.panel_;
+  }
+
+  /**
+   * Move the map button. An unknown value falls back to the default for the
+   * panel's side.
+   * @param {ButtonPosition} position
+   */
+  setButtonPosition(position) {
+    this.set('buttonPosition', this.normalizeButtonPosition_(position));
+  }
+
+  /** @return {ButtonPosition} Where the map button sits. */
+  getButtonPosition() {
+    return /** @type {ButtonPosition} */ (this.get('buttonPosition'));
   }
 
   /**
@@ -696,6 +734,33 @@ export default class LayerControl extends Control {
     this.updateStates_();
   }
 
+  /**
+   * @private
+   * @param {string|undefined} position
+   * @return {ButtonPosition}
+   */
+  normalizeButtonPosition_(position) {
+    if (position === undefined) {
+      return this.defaultButtonPosition_;
+    }
+    if (BUTTON_POSITIONS.includes(/** @type {ButtonPosition} */ (position))) {
+      return /** @type {ButtonPosition} */ (position);
+    }
+    console.warn(
+      `ol-layer-control: unknown buttonPosition "${position}", using "${this.defaultButtonPosition_}". ` +
+        `Valid values: ${BUTTON_POSITIONS.join(', ')}.`,
+    );
+    return this.defaultButtonPosition_;
+  }
+
+  /** @private */
+  applyButtonPosition_() {
+    const current = this.getButtonPosition();
+    for (const position of BUTTON_POSITIONS) {
+      this.element.classList.toggle(`${CSS}--${position}`, position === current);
+    }
+  }
+
   // ---------------------------------------------------------------------
   // Search
   // ---------------------------------------------------------------------
@@ -839,7 +904,7 @@ export default class LayerControl extends Control {
    */
   listedLayers_(collection) {
     const layers = collection.getArray().filter(
-      (layer) => layer.get('displayInLayerSwitcher') !== false && layer.get('title'),
+      (layer) => layer.get('displayInLayerControl') !== false && layer.get('title'),
     );
     if (this.reverse_) {
       layers.reverse();

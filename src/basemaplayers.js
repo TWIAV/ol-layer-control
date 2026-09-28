@@ -92,7 +92,7 @@ const openTopoMapLayer = new TileLayer({
 const openTopoMapGrijsLayer = new TileLayer({
   title: 'OpenTopoMap (grijs)',
   type: 'base',
-  visible: true,
+  visible: false,
   source: openTopoMapSource,
   className: 'ol-layer css-filter-grayscale'
 });

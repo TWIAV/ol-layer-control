@@ -16,6 +16,8 @@ const DEFAULT_BASEMAP_INDEX = 8; // element in baseMapsLayerGroup — see basema
 const minZoom = 3;
 const maxZoom = 19;
 
+baseMaps.item(DEFAULT_BASEMAP_INDEX).setVisible(true);
+
 const view = new View({
   minZoom,
   maxZoom,
@@ -47,4 +49,4 @@ const map = new Map({
   view,
 });
 
-map.addControl(new LayerControl({open: true, opacitySlider: true}));
+map.addControl(new LayerControl({open: true, opacitySlider: true, side: 'right'}));

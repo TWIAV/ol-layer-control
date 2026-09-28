@@ -6,7 +6,7 @@ The panel is rendered **next to** the map, never on top of it. The map shrinks w
 
 ## Features
 
-- Map button with an inline SVG icon that opens and closes the panel.
+- Map button with an inline SVG icon that opens and closes the panel, in one of five positions that stay clear of the OpenLayers default controls.
 - Panel docked to the right (or left) of the map, resizable by dragging its edge. Double-click the edge to reset the width.
 - Nested layer groups, with fold/unfold per group.
 - Basemaps as radio buttons (only one visible at a time).
@@ -37,7 +37,7 @@ The control reads these properties from layers and groups. Set them as construct
 | Property                 | On            | Meaning                                                                                  |
 | ------------------------ | ------------- | ---------------------------------------------------------------------------------------- |
 | `title`                  | layer, group  | Text shown in the panel. Layers without a title are not listed.                          |
-| `displayInLayerSwitcher` | layer, group  | `false` hides the layer or group from the panel.                                         |
+| `displayInLayerControl`  | layer, group  | `false` hides the layer or group from the panel.                                         |
 | `type: 'base'`           | layer         | Marks a basemap. A group containing basemaps is exclusive and has no checkbox of its own. |
 | `exclusive`              | group         | `true` renders the children as radio buttons. Right-clicking the group title toggles it. |
 | `combine`                | group         | `true` shows the group as a single layer instead of expanding its children.              |
@@ -65,6 +65,7 @@ const overlays = new LayerGroup({
 | ----------------- | ------------------------- | --------- | ---------------------------------------------------------------------------------------------------- |
 | `open`            | `boolean`                 | `false`   | Start with the panel open.                                                                           |
 | `side`            | `'right' \| 'left'`       | `'right'` | Side of the map the panel docks to.                                                                  |
+| `buttonPosition`  | `ButtonPosition`          | per side  | Where the map button sits. See [Button position](#button-position). Defaults to `'top-left'` when `side` is `'left'`, otherwise `'right'`. |
 | `panelWidth`      | `number`                  | `320`     | Initial panel width in pixels.                                                                       |
 | `minPanelWidth`   | `number`                  | `200`     | Smallest width the user can resize to.                                                               |
 | `maxPanelWidth`   | `number`                  | `800`     | Largest width the user can resize to. The control also always leaves some map visible.               |
@@ -84,6 +85,7 @@ const overlays = new LayerGroup({
 | `open()`, `close()`, `toggle()` | Show or hide the panel.                                                              |
 | `isOpen()`                      | Whether the panel is shown.                                                          |
 | `setPanelWidth(px)`             | Set the panel width (clamped to min/max).                                            |
+| `setButtonPosition(position)`, `getButtonPosition()` | Move the map button, or read where it is.                       |
 | `getPanelWidth()`               | Current panel width in pixels.                                                       |
 | `getPanelElement()`             | The panel element.                                                                   |
 | `setExclusive(group, boolean)`  | Make a group exclusive or not. When several children are visible, only the top-most stays visible. |
@@ -99,10 +101,33 @@ The control is an OpenLayers `Control`, so `control.on(...)` works. These proper
 | `open`          | `boolean` | `change:open`           |
 | `panelWidth`    | `number`  | `change:panelWidth`     |
 | `searchVisible` | `boolean` | `change:searchVisible`  |
+| `buttonPosition` | `ButtonPosition` | `change:buttonPosition` |
 
 ```js
 control.on('change:open', () => console.log('panel open:', control.isOpen()));
 ```
+
+### Button position
+
+The map button can sit in five places. Each one leaves room for the OpenLayers default control that normally uses that part of the map.
+
+| `buttonPosition` | Where                                                                                           |
+| ---------------- | ----------------------------------------------------------------------------------------------- |
+| `'top-left'`     | Top left, below the Zoom buttons.                                                               |
+| `'bottom-left'`  | Bottom left corner.                                                                             |
+| `'top-right'`    | Top right corner. This is the Rotate button's spot, see the note below.                         |
+| `'right'`        | Top right, below the Rotate button.                                                             |
+| `'bottom-right'` | Bottom right, above the Attribution button.                                                     |
+
+The Rotate button only appears when the map is rotated, and it appears in the top-right corner. With `'top-right'` the layer button covers it. That is why the default for a right-side panel is `'right'`, just below it.
+
+```js
+new LayerControl({ side: 'right', buttonPosition: 'bottom-right' });
+```
+
+The list of valid values is exported as `BUTTON_POSITIONS`. An unknown value logs a warning and falls back to the default for the panel's side.
+
+The offsets assume the default OpenLayers controls. When you add others, such as a ScaleLine at the bottom left, adjust the spacing with `--ol-layer-control-edge` and `--ol-layer-control-gap` (see [Theming](#theming)), or override the position classes `ol-layer-control--top-left`, `ol-layer-control--bottom-left`, `ol-layer-control--top-right`, `ol-layer-control--right` and `ol-layer-control--bottom-right`.
 
 ### Translating
 
@@ -147,6 +172,8 @@ All colours and sizes are CSS custom properties. Override them on any ancestor o
   --ol-layer-control-font: 14px/1.4 system-ui, sans-serif;
   --ol-layer-control-indent: 1.4em;
   --ol-layer-control-shadow: none;
+  --ol-layer-control-edge: 0.5em; /* map button distance from the map edge */
+  --ol-layer-control-gap: 0.5em;  /* space between the map button and the OpenLayers control it avoids */
 }
 ```
 

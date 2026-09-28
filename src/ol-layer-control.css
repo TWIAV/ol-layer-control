@@ -11,13 +11,49 @@
  *   --ol-layer-control-font      panel font shorthand
  *   --ol-layer-control-indent    indentation of nested groups
  *   --ol-layer-control-shadow    panel drop shadow
+ *   --ol-layer-control-edge      distance of the map button from the map edge
+ *   --ol-layer-control-gap       space between the map button and the
+ *                                OpenLayers control it makes room for
  */
 
 /* --- map button (inside the map, styled by ol.css as an .ol-control) --- */
 
+/*
+ * Five positions, set by the `buttonPosition` option. Offsets are derived
+ * from ol.css: controls sit 0.5em from the map edge, and a control button
+ * is 1.375em high with a 1px margin on each side.
+ */
 .ol-layer-control {
-  top: 0.5em;
-  right: 0.5em;
+  --ol-layer-control-button-size: calc(1.375em + 2px);
+}
+
+/* Below the two Zoom buttons. */
+.ol-layer-control--top-left {
+  top: calc(var(--ol-layer-control-edge, 0.5em) + 2 * var(--ol-layer-control-button-size) + var(--ol-layer-control-gap, 0.5em));
+  left: var(--ol-layer-control-edge, 0.5em);
+}
+
+.ol-layer-control--bottom-left {
+  bottom: var(--ol-layer-control-edge, 0.5em);
+  left: var(--ol-layer-control-edge, 0.5em);
+}
+
+/* Same spot as the Rotate button, which only shows when the map is rotated. */
+.ol-layer-control--top-right {
+  top: var(--ol-layer-control-edge, 0.5em);
+  right: var(--ol-layer-control-edge, 0.5em);
+}
+
+/* Below the Rotate button. */
+.ol-layer-control--right {
+  top: calc(var(--ol-layer-control-edge, 0.5em) + var(--ol-layer-control-button-size) + var(--ol-layer-control-gap, 0.5em));
+  right: var(--ol-layer-control-edge, 0.5em);
+}
+
+/* Above the Attribution button. */
+.ol-layer-control--bottom-right {
+  bottom: calc(var(--ol-layer-control-edge, 0.5em) + var(--ol-layer-control-button-size) + var(--ol-layer-control-gap, 0.5em));
+  right: var(--ol-layer-control-edge, 0.5em);
 }
 
 .ol-layer-control button svg {
