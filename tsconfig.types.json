@@ -1,0 +1,19 @@
+{
+  // Generates TypeScript declarations (types/) from the JSDoc in src/.
+  // Run with `npm run build:types`; `npm pack` and `npm publish` run it automatically.
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "outDir": "types",
+    "rootDir": "src",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "skipLibCheck": true,
+    "strict": false
+  },
+  "include": ["src/ol-layer-control.js"]
+}

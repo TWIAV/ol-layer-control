@@ -1,17 +1,60 @@
 {
   "name": "ol-layer-control",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "description": "A layer control for OpenLayers: a map button that opens a docked, resizable side panel to switch layers and layer groups on and off.",
+  "keywords": [
+    "openlayers",
+    "ol",
+    "layer-control",
+    "layer-switcher",
+    "layerswitcher",
+    "map",
+    "gis",
+    "control"
+  ],
+  "homepage": "https://github.com/TWIAV/ol-layer-control#readme",
+  "bugs": {
+    "url": "https://github.com/TWIAV/ol-layer-control/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TWIAV/ol-layer-control.git"
+  },
+  "license": "MIT",
+  "author": "TWIAV",
   "type": "module",
+  "main": "./src/ol-layer-control.js",
+  "types": "./types/ol-layer-control.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/ol-layer-control.d.ts",
+      "default": "./src/ol-layer-control.js"
+    },
+    "./ol-layer-control.css": "./src/ol-layer-control.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "types",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "build:types": "tsc -p tsconfig.types.json && node scripts/clean-types.js",
+    "prepack": "npm run build:types"
+  },
+  "peerDependencies": {
+    "ol": "^10.0.0"
   },
   "devDependencies": {
+    "ol": "^10.10.0",
+    "proj4": "^2.22.0",
+    "typescript": "^6.0.3",
     "vite": "^8.3.0"
-  },
-  "dependencies": {
-    "ol": "latest",
-    "proj4": "^2.22.0"
   }
 }

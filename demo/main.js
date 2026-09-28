@@ -1,7 +1,7 @@
 import './style.css';
 import {Map, View} from 'ol';
 import LayerGroup from 'ol/layer/Group.js';
-import LayerControl from './ol-layer-control.js';
+import LayerControl from '../src/ol-layer-control.js';
 
 import { baseMapsLayerGroup } from './basemaplayers.js';
 import { bodemvlakkenLayer, kadParcelsLayer, ahnLayer, natura2000Layer, waterschappenLayer, gemeentenLayer, provinciesLayer, nnnLayer } from './wmslayers.js';

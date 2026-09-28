@@ -28,5 +28,11 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build demo
         run: npm run build
+
+      - name: Build type declarations
+        run: npm run build:types
+
+      - name: Check package contents
+        run: npm pack --dry-run

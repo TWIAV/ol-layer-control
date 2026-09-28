@@ -18,17 +18,31 @@ The panel is rendered **next to** the map, never on top of it. The map shrinks w
 - English by default. Every string can be translated.
 - Keyboard accessible: real checkboxes, radios and buttons, Escape closes the panel.
 
+## Installation
+
+```bash
+npm install ol-layer-control
+```
+
+The package requires OpenLayers 10 (`ol` is a peer dependency, so your app provides it). TypeScript declarations are included.
+
 ## Usage
 
 ```js
 import Map from 'ol/Map.js';
-import LayerControl from './ol-layer-control.js'; // ships its own CSS
+import LayerControl from 'ol-layer-control';
 
 const map = new Map({ /* ... */ });
 map.addControl(new LayerControl({ open: true }));
 ```
 
-The control imports its stylesheet itself, so with a bundler (Vite, webpack, Parcel, Rollup + PostCSS) the single import above is all you need.
+The package is published as ES modules and needs a bundler, such as Vite, webpack, Parcel, or Rollup with a CSS plugin. The control imports its own stylesheet, so the single import above is all you need.
+
+If your setup handles CSS separately, the stylesheet is also available on its own:
+
+```js
+import 'ol-layer-control/ol-layer-control.css';
+```
 
 ### Layer properties
 
@@ -134,7 +148,7 @@ The offsets assume the default OpenLayers controls. When you add others, such as
 Pass any subset of the strings in the `i18n` option, or call `setI18n()` later. The full set, with the English defaults, is exported as `DEFAULT_I18N`.
 
 ```js
-import LayerControl, { DEFAULT_I18N } from './ol-layer-control.js';
+import LayerControl, { DEFAULT_I18N } from 'ol-layer-control';
 
 new LayerControl({
   i18n: {
@@ -189,21 +203,37 @@ If your app has its own layout (flexbox, a sidebar component, a framework), pass
 
 ## Development
 
-The repository contains a demo app (Dutch PDOK services in EPSG:28992) used to develop and test the control. It requires Node 18+.
+The control lives in `src/`: `ol-layer-control.js` and `ol-layer-control.css`. It is published as-is, without a build step.
+
+The `demo/` folder holds an app (Dutch PDOK services in EPSG:28992) used to develop and test the control. It requires Node 20.19 or newer.
 
 ```bash
 npm install
 npm start
 ```
 
-The demo runs at http://localhost:5173. The control itself lives in `src/ol-layer-control.js` and `src/ol-layer-control.css`; the rest of `src/` is the demo.
-
-To create a production build of the demo:
+The demo runs at http://localhost:5173. To create a production build of the demo in `dist/`:
 
 ```bash
 npm run build
 ```
 
+The TypeScript declarations in `types/` are generated from the JSDoc comments in `src/`. `npm pack` and `npm publish` generate them automatically. To generate them by hand:
+
+```bash
+npm run build:types
+```
+
+To see exactly which files a release would contain:
+
+```bash
+npm pack --dry-run
+```
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
+
 ## Roadmap
 
-- Publish as an npm package with `ol` as a peer dependency and generated type declarations.
+- Legends, using the `legend` property already present on the demo layers.
