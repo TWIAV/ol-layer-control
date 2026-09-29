@@ -63,6 +63,8 @@ import './ol-layer-control.css';
  * @property {string} searchPlaceholder Placeholder text of the search box.
  * @property {string} searchClearTitle Tooltip of the button that clears the search box.
  * @property {string} searchNoResults Message shown when no layer matches the search.
+ * @property {string} emptyMessage Message shown when the map has no layers to list,
+ *     usually because none of them has a `title`.
  */
 
 /** @type {LayerControlI18n} */
@@ -81,6 +83,7 @@ export const DEFAULT_I18N = Object.freeze({
   searchPlaceholder: 'Search layers',
   searchClearTitle: 'Clear search',
   searchNoResults: 'No layers match',
+  emptyMessage: 'No layers to show. Only layers and groups with a title are listed.',
 });
 
 /**
@@ -334,6 +337,10 @@ export default class LayerControl extends Control {
     this.noResults_ = el('p', `${CSS}-no-results`);
     this.noResults_.hidden = true;
     body.appendChild(this.noResults_);
+    /** @private @type {HTMLElement} Shown when there is nothing to list at all. */
+    this.emptyMessage_ = el('p', `${CSS}-empty`);
+    this.emptyMessage_.hidden = true;
+    body.appendChild(this.emptyMessage_);
     this.panel_.appendChild(body);
 
     this.applyTexts_();
@@ -713,6 +720,7 @@ export default class LayerControl extends Control {
     this.searchClear_.title = t.searchClearTitle;
     this.searchClear_.setAttribute('aria-label', t.searchClearTitle);
     this.noResults_.textContent = t.searchNoResults;
+    this.emptyMessage_.textContent = t.emptyMessage;
     this.closeButton_.title = t.closeTitle;
     this.closeButton_.setAttribute('aria-label', t.closeTitle);
     if (this.resizer_) {
@@ -816,7 +824,7 @@ export default class LayerControl extends Control {
     for (const entry of this.entries_) {
       entry.item.classList.toggle(hiddenClass, !shown.has(entry.layer));
     }
-    this.noResults_.hidden = shown.size > 0;
+    this.noResults_.hidden = shown.size > 0 || this.entries_.length === 0;
   }
 
   // ---------------------------------------------------------------------
@@ -848,11 +856,13 @@ export default class LayerControl extends Control {
     this.entries_ = [];
     this.parents_ = new Map();
     this.rootList_.textContent = '';
+    this.emptyMessage_.hidden = true;
     const map = this.getMap();
     if (!map) {
       return;
     }
     this.renderCollection_(map.getLayerGroup().getLayers(), this.rootList_, null, null);
+    this.emptyMessage_.hidden = this.entries_.length > 0;
     this.updateStates_();
     this.applyFilter_();
   }

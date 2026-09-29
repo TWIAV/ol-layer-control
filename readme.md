@@ -30,11 +30,34 @@ The package requires OpenLayers 10 (`ol` is a peer dependency, so your app provi
 
 ```js
 import Map from 'ol/Map.js';
+import View from 'ol/View.js';
+import LayerGroup from 'ol/layer/Group.js';
+import TileLayer from 'ol/layer/Tile.js';
+import OSM from 'ol/source/OSM.js';
 import LayerControl from 'ol-layer-control';
 
-const map = new Map({ /* ... */ });
+const map = new Map({
+  target: 'map',
+  layers: [
+    new LayerGroup({
+      properties: { title: 'Basemaps' },
+      layers: [
+        new TileLayer({
+          source: new OSM(),
+          properties: { title: 'OpenStreetMap', type: 'base' },
+        }),
+      ],
+    }),
+  ],
+  view: new View({ center: [0, 0], zoom: 2 }),
+});
+
 map.addControl(new LayerControl({ open: true }));
 ```
+
+Only layers and groups with a `title` appear in the panel. Layers without one, such as helper layers for drawing or highlighting, are left out on purpose. If the panel says "No layers to show", give your layers a title.
+
+You can set layer properties in the `properties` option, as above, or as plain options such as `title: 'OpenStreetMap'`. OpenLayers stores unknown options as properties too, but TypeScript only accepts the `properties` form.
 
 The package is published as ES modules and needs a bundler, such as Vite, webpack, Parcel, or Rollup with a CSS plugin. The control imports its own stylesheet, so the single import above is all you need.
 
@@ -166,6 +189,7 @@ new LayerControl({
     searchPlaceholder: 'Lagen zoeken',
     searchClearTitle: 'Zoekopdracht wissen',
     searchNoResults: 'Geen lagen gevonden',
+    emptyMessage: 'Geen lagen om te tonen. Alleen lagen en groepen met een titel worden weergegeven.',
   },
 });
 ```

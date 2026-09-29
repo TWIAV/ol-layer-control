@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- A message in the panel when the map has no layers to list, explaining that only layers and groups with a `title` are shown. Translatable through the new `emptyMessage` string.
+
+### Changed
+
+- The README usage example now builds a complete map with a titled basemap inside a titled layer group.
+
 ## [0.1.0] - 2026-09-28
 
 First public release.

@@ -225,7 +225,8 @@
   display: block;
 }
 
-.ol-layer-control-no-results {
+.ol-layer-control-no-results,
+.ol-layer-control-empty {
   margin: 0.5em 0;
   opacity: 0.7;
   font-style: italic;
