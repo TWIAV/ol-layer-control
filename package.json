@@ -1,6 +1,6 @@
 {
   "name": "ol-layer-control",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A layer control for OpenLayers: a map button that opens a docked, resizable side panel to switch layers and layer groups on and off.",
   "keywords": [
     "openlayers",
