@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-29
+
+### Changed
+
+- The panel now takes the map element's top and height instead of filling the map's parent from top to bottom. A header or footer around the map no longer needs a wrapper element: the panel starts and ends where the map does, and stays aligned when the map or its parent changes size. Horizontally the panel still docks to the left or right edge of the map's parent.
+- The README layout section shows a page with a header, and explains when a wrapper element is still useful: for a map that does not span the full width of its parent.
+
 ## [0.1.1] - 2026-09-29
 
 ### Added
@@ -35,6 +42,7 @@ First public release.
 - Theming through CSS custom properties.
 - TypeScript declarations generated from the JSDoc.
 
-[Unreleased]: https://github.com/TWIAV/ol-layer-control/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/TWIAV/ol-layer-control/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/TWIAV/ol-layer-control/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/TWIAV/ol-layer-control/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/TWIAV/ol-layer-control/releases/tag/v0.1.0

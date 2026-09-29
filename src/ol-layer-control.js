@@ -6,8 +6,10 @@
  *
  * The panel is rendered *next to* the map, never on top of it. By default
  * the control inserts the panel as a sibling of the map's target element
- * and shrinks the map while the panel is open. Pass `panelTarget` to
- * render the panel somewhere else and handle the layout yourself.
+ * and shrinks the map while the panel is open. The panel takes the map's
+ * top and height, so a header or footer around the map needs no extra
+ * markup. Pass `panelTarget` to render the panel somewhere else and handle
+ * the layout yourself.
  *
  * Layer properties the control understands (set them via layer options or
  * `layer.set(...)`):
@@ -258,6 +260,8 @@ export default class LayerControl extends Control {
     this.viewListenerKeys_ = [];
     /** @private @type {HTMLElement|null} */
     this.resizer_ = null;
+    /** @private @type {ResizeObserver|null} Keeps the panel level with the map. */
+    this.hostObserver_ = null;
 
     // --- map button -------------------------------------------------------
     /** @private @type {HTMLButtonElement} */
@@ -583,6 +587,7 @@ export default class LayerControl extends Control {
           marginLeft: host.style.marginLeft,
         };
         host.classList.add(`${CSS}-host`);
+        this.observeHost_(host);
       }
       if (this.panel_.previousSibling !== host) {
         host.parentNode.insertBefore(this.panel_, host.nextSibling);
@@ -602,8 +607,52 @@ export default class LayerControl extends Control {
       host.style.marginLeft = this.hostSavedStyle_.marginLeft;
     }
     host.classList.remove(`${CSS}-host`, `${CSS}-host--open`);
+    if (this.hostObserver_) {
+      this.hostObserver_.disconnect();
+      this.hostObserver_ = null;
+    }
+    const style = this.panel_.style;
+    style.top = style.height = style.bottom = '';
     this.hostElement_ = null;
     this.hostSavedStyle_ = null;
+  }
+
+  /**
+   * Re-align the panel whenever the map element or its parent changes size,
+   * e.g. on a window resize or when a header above the map grows.
+   * @private
+   * @param {HTMLElement} host
+   */
+  observeHost_(host) {
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+    this.hostObserver_ = new ResizeObserver(() => this.alignPanel_());
+    this.hostObserver_.observe(host);
+    if (host.parentElement) {
+      this.hostObserver_.observe(host.parentElement);
+    }
+  }
+
+  /**
+   * Gives the panel the same top and height as the map element, so it sits
+   * exactly beside the map even when the map does not fill its parent (for
+   * example below a header). Horizontally the panel stays docked to the
+   * parent's left or right edge.
+   * @private
+   */
+  alignPanel_() {
+    const host = this.hostElement_;
+    if (!host || this.panelTarget_ || !this.isOpen()) {
+      return;
+    }
+    const panel = this.panel_;
+    const hostRect = host.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    const currentTop = parseFloat(getComputedStyle(panel).top) || 0;
+    panel.style.top = `${currentTop + hostRect.top - panelRect.top}px`;
+    panel.style.bottom = 'auto';
+    panel.style.height = `${hostRect.height}px`;
   }
 
   /** @private */
@@ -651,6 +700,7 @@ export default class LayerControl extends Control {
         host.style.width = this.hostSavedStyle_.width;
         host.style.marginLeft = this.hostSavedStyle_.marginLeft;
       }
+      this.alignPanel_();
     }
 
     const map = this.getMap();

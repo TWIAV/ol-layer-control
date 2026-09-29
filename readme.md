@@ -221,7 +221,46 @@ Every element carries a class starting with `ol-layer-control-`, so anything els
 
 By default the control inserts the panel as a sibling of the map's target element and, while the panel is open, sets an inline `width: calc(100% - <panel width>)` on the map element (plus a `margin-left` when the panel is on the left). It calls `map.updateSize()` after every change and restores the original inline style when the panel closes.
 
-The panel is absolutely positioned with `top: 0; bottom: 0` against the map's nearest positioned ancestor. This works out of the box when the map fills the page. When the map sits inside a page with other content, give the map's parent element `position: relative` so the panel lines up with the map.
+The panel is absolutely positioned. Vertically it follows the map element: the control gives the panel the map's top and height, and keeps them in sync when the map or its parent changes size. So a header or footer around the map needs no extra markup. Horizontally the panel docks to the left or right edge of the map's parent element.
+
+#### Example: a page with a header
+
+Place the map below the header as usual. The panel starts where the map starts, not at the top of the page:
+
+```html
+<body>
+  <div id="header">...</div>
+  <div id="map"></div>
+</body>
+```
+
+```css
+html, body {
+  margin: 0;
+  height: 100%;
+}
+#header {
+  height: 70px;
+}
+#map {
+  position: absolute;
+  top: 70px; /* the header height */
+  bottom: 0;
+  width: 100%;
+}
+```
+
+While the panel is open, the control narrows the map to make room for it.
+
+#### When the map does not span the full width
+
+Because the panel docks to an edge of the map's parent, a map with space beside it (a sidebar, a margin) would get a panel at the parent's edge instead of the map's. Put the map in a wrapper element that:
+
+- is positioned itself (`position: relative`, `absolute` or `fixed`),
+- has the size and place you want for map and panel together,
+- contains only the map element.
+
+The panel is then inserted inside the wrapper, next to the map.
 
 If your app has its own layout (flexbox, a sidebar component, a framework), pass `panelTarget`. The control then renders the panel into that element and leaves the map element alone.
 
